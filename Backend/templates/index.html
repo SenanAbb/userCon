@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div>
+        <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
+        <form class= "boton-signin" action="{{ url_for('login') }}" method="GET">
+            <input type=text name="name" placeholder="Name">
+            <button class="btn btn-lg btn-primary btn-block">Sign in</button>
+        </form>
+        <form class="boton-register" action="{{ url_for('login') }}" method="POST">
+            <input type=text name="name" placeholder="Name">
+            <button class="btn btn-lg btn-primary btn-block">Register</button>
+        </form>
+    </div>
+</body>
+</html>
