@@ -19,7 +19,7 @@ def login():
         user = mongo.db.users.find_one({'name': name})
         return render_template("homepage.html", user = user)
     else:
-        name = request.args.get('name')
+        name = request.form.get('name')
         #Si no se encuentra en la base de datos -> lo creo (aseguramos que sea unico)
         if (not mongo.db.users.find_one({"name": name})):
             id = mongo.db.users.insert_one({
@@ -57,7 +57,7 @@ def add_conn(id_user, name_to_add):
     ]
 
     #Actualizo los usuarios
-    update = mongo.db.users.update(
+    update = mongo.db.users.update_one(
         {'_id': ObjectId(id_user)},
         {'$set':{
             'conn': user['conn']
@@ -65,7 +65,7 @@ def add_conn(id_user, name_to_add):
         }
     )
 
-    update = mongo.db.users.update(
+    update = mongo.db.users.update_one(
         {'_id': user_to_add['_id']},
         {'$set':{
             'conn': user_to_add['conn']
@@ -74,45 +74,27 @@ def add_conn(id_user, name_to_add):
     )
     return "1"
 
-#Almacenar en conn el ID del usuario y su nombre
 @app.route('/deleteConn/<id>/<id_to_delete>', methods=['PUT'])
 def delete_conn(id, id_to_delete):
-    user = mongo.db.users.find_one({'_id':ObjectId(id)})
-    #Busco el usuario que quiero eliminar y lo elimino
-    for u in user['conn']:
-        if (u == "_id"):
-            print ("OK")
-    #Actualizamos el usuario de la sesion
-    ##update_conn_list(id, id_to_delete)
-    #Y viceversa
-    ##update_conn_list(id_to_delete, id)
-    return "1"
+    update_conn_list(id, id_to_delete)
+    update_conn_list(id_to_delete, id)
+    print(id)
+    print(id_to_delete)
+    return "boorao"
 
 def update_conn_list(id, id_to_delete):
     cont = 0
-    #Buscamos al usuario de la sesion
+    #Buscamos al usuario con "id"
     user = mongo.db.users.find_one({'_id':ObjectId(id)})
-    #Busco el usuario que quiero eliminar y lo elimino
-    for u in user['conn']:
-
-        '''
-        if (u['_id'] == ObjectId(id_to_delete)):
-            #user['conn'].pop(cont)
-            print("************************")
-            print(user['conn'])
-            break
-        cont += 1
-        '''
     #Actualizo el usuario
     update = mongo.db.users.update_one(
         {'_id':ObjectId(id)},
-        {'$set':{
-            'conn': user['conn']
-            }
+        {'$pull':
+            {'conn': {'$elemMatch': {'_id': ObjectId(id_to_delete)}}}
         }
     )
 
-def update_user_deleted_conn_list(name_to_delete, id, cont):
+def update_user_deleted_conn_list(name_to_delete, id, cont):    
     cont = 0
     #Busco el usuario de la sesion
     data = mongo.db.users.find_one({"name":name_to_delete})
